@@ -1,0 +1,47 @@
+html,
+body,
+#root,
+.app {
+  height: 100%;
+  font-family: 'Roboto';
+}
+
+.cw-Filters {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.cw-Filters-itemLabel {
+  font-size: 13px;
+  color: #777;
+}
+
+.cw-Filters-item {
+  flex: 1 0 auto;
+  max-width: 300px;
+  margin-right: 15px;
+}
+
+.cw-Filters-item--input input {
+  height: 34px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font-size: 16px;
+  width: 100%;
+}
+
+.cw-Filters-item--datepicker {
+  max-width: 170px;
+}
+
+.cw-Filters-item--datepicker input {
+  text-align: center;
+  cursor: pointer;
+}
+
+.cw-Filters-item--datepicker input:hover,
+.cw-Filters-item--datepicker input:active {
+  background: rgba(34, 34, 34, 0.1);
+  border: 1px solid #ccc;
+}
