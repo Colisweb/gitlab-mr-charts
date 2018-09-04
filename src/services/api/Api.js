@@ -3,10 +3,10 @@
 import axios from 'axios'
 import { uniqBy } from 'lodash'
 
-export const getProjectDetails = (projectId: string, token: string) =>
+export const getProjectDetails = (projectId: string, token: string): Promise<{}> =>
   axios.get(`https://gitlab.com/api/v4/projects/${projectId}?private_token=${token}`).then(res => res.data)
 
-export const getMergeRequestDetails = (projectId: string, mergeRequestId: string, token: string) =>
+export const getMergeRequestDetails = (projectId: string, mergeRequestId: string, token: string): Promise<{}> =>
   axios
     .get(`https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}?private_token=${token}`)
     .then(res => res.data)
@@ -17,7 +17,18 @@ type GetMergeRequestsBody = {|
   token: string
 |}
 
-export const getMergeRequests = ({ createdAfter, state, token }: GetMergeRequestsBody) =>
+type GetMergeRequestsPayload = {|
+  projects: {
+    [project_id: string]: Object
+  },
+  mergeRequests: Array<{}>
+|}
+
+export const getMergeRequests = ({
+  createdAfter,
+  state,
+  token
+}: GetMergeRequestsBody): Promise<GetMergeRequestsPayload> =>
   axios
     .get(
       `https://gitlab.com/api/v4/groups/colisweb/merge_requests?state=${state}&scope=all&created_after=${createdAfter}&private_token=${token}`

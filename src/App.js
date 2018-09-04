@@ -73,7 +73,7 @@ const selectOptions = [
 type MomentDate = Object
 
 type SelectOption = {|
-  value: string,
+  value: Config,
   label: string
 |}
 
