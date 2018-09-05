@@ -91,7 +91,8 @@ type AppState = {|
   rows: Array<{}>,
   selectedDate: MomentDate,
   token: string,
-  columns: Array<{}>
+  columns: Array<{}>,
+  rawMergeRequests: Array<{}>
 |}
 
 class App extends Component<{}, AppState> {
@@ -101,7 +102,8 @@ class App extends Component<{}, AppState> {
     selectedDate: moment('2018-08-01'),
     token: window.localStorage.getItem('_cwAccessToken') || '',
     rows: [],
-    columns: getColumnsConfig(selectOptions[0].value)
+    columns: getColumnsConfig(selectOptions[0].value),
+    rawMergeRequests: []
   }
 
   componentDidMount () {
@@ -127,7 +129,6 @@ class App extends Component<{}, AppState> {
         createdAfter: selectedDate.format('YYYY-MM-DD'),
         token
       }).then(({ projects, mergeRequests }) => {
-        console.log(mergeRequests)
         this.setState({
           rows: mergeRequests.map(item =>
             getRowValue({
@@ -136,6 +137,7 @@ class App extends Component<{}, AppState> {
               item
             })
           ),
+          rawMergeRequests: mergeRequests,
           columns: getColumnsConfig(selectedOptions.value),
           isLoading: false
         })
@@ -206,7 +208,24 @@ class App extends Component<{}, AppState> {
         ) : token ? (
           <React.Fragment>
             {rows.length ? (
-              <Chart chartType='Timeline' data={[columns, ...rows]} width='100%' height='100%' legendToggle />
+              <Chart
+                chartType='Timeline'
+                data={[columns, ...rows]}
+                width='100%'
+                height='100%'
+                chartEvents={[
+                  {
+                    eventName: 'select',
+                    callback: ({ chartWrapper }) => {
+                      const [{ row }] = chartWrapper.getChart().getSelection()
+                      const mr = this.state.rawMergeRequests[row]
+
+                      window.open(mr.web_url, '_blank')
+                    }
+                  }
+                ]}
+                legendToggle
+              />
             ) : (
               'No MR found'
             )}
