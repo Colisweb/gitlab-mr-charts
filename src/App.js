@@ -9,7 +9,7 @@ import moment from 'moment'
 import { Loader } from './components/loader'
 import 'react-datepicker/dist/react-datepicker-cssmodules.css'
 
-type Config = 'merged' | 'opened' | 'closed' | 'locked'
+type Config = 'merged' | 'opened' | 'closed' | 'locked' | 'all'
 
 const getColumnsConfig = (config: Config) => {
   const commonConfig = [
@@ -20,6 +20,8 @@ const getColumnsConfig = (config: Config) => {
   ]
 
   switch (config) {
+    case 'all':
+      return [...commonConfig]
     case 'merged':
       return [...commonConfig]
     case 'opened':
@@ -37,6 +39,8 @@ const getRowValue = ({ config, projects, item }) => {
   const commonValue = [projects[item.project_id].name, item.title, new Date(item.created_at)]
 
   switch (config) {
+    case 'all':
+      return [...commonValue, item.merged_at ? new Date(item.merged_at) : new Date()]
     case 'merged':
       return [...commonValue, new Date(item.merged_at)]
     case 'opened':
@@ -52,6 +56,10 @@ const getRowValue = ({ config, projects, item }) => {
 }
 
 const selectOptions = [
+  {
+    value: 'all',
+    label: 'all'
+  },
   {
     value: 'merged',
     label: 'merged'
@@ -119,6 +127,7 @@ class App extends Component<{}, AppState> {
         createdAfter: selectedDate.format('YYYY-MM-DD'),
         token
       }).then(({ projects, mergeRequests }) => {
+        console.log(mergeRequests)
         this.setState({
           rows: mergeRequests.map(item =>
             getRowValue({
@@ -195,7 +204,13 @@ class App extends Component<{}, AppState> {
         {isLoading ? (
           <Loader />
         ) : token ? (
-          <Chart chartType='Timeline' data={[columns, ...rows]} width='100%' height='100%' legendToggle />
+          <React.Fragment>
+            {rows.length ? (
+              <Chart chartType='Timeline' data={[columns, ...rows]} width='100%' height='100%' legendToggle />
+            ) : (
+              'No MR found'
+            )}
+          </React.Fragment>
         ) : (
           'A token is required'
         )}
