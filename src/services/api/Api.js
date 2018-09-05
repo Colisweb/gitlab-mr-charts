@@ -1,7 +1,8 @@
 // @flow
 
 import axios from 'axios'
-import { uniqBy } from 'lodash'
+import { uniqBy, difference } from 'lodash'
+import { Object } from 'core-js'
 
 export const getProjectDetails = (projectId: string, token: string): Promise<{}> =>
   axios.get(`https://gitlab.com/api/v4/projects/${projectId}?private_token=${token}`).then(res => res.data)
@@ -10,6 +11,18 @@ export const getMergeRequestDetails = (projectId: string, mergeRequestId: string
   axios
     .get(`https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}?private_token=${token}`)
     .then(res => res.data)
+
+const fetchProjects = (projects: Array<{}>, token: string): Promise<{}> =>
+  Promise.all(projects.map(project => getProjectDetails(project.project_id, token))).then(projects => {
+    const projectsHash = projects.reduce((acc, item) => {
+      acc[item.id] = item
+      return acc
+    }, {})
+
+    window.localStorage.setItem('_cwProjects', JSON.stringify(projectsHash))
+
+    return projectsHash
+  })
 
 type GetMergeRequestsBody = {|
   createdAfter: string,
@@ -37,13 +50,27 @@ export const getMergeRequests = ({
     .then(data => {
       return Promise.all(data.map(d => getMergeRequestDetails(d.project_id, d.iid, token))).then(data => {
         const projects = uniqBy(data, d => d.project_id)
+        const savedProjects = window.localStorage.getItem('_cwProjects')
 
-        return Promise.all(projects.map(project => getProjectDetails(project.project_id, token))).then(projects => ({
-          projects: projects.reduce((acc, item) => {
-            acc[item.id] = item
-            return acc
-          }, {}),
-          mergeRequests: data
-        }))
+        if (savedProjects) {
+          const savedProjectsParsed = JSON.parse(savedProjects)
+
+          if (difference(savedProjectsParsed, projects).length) {
+            return fetchProjects(projects, token).then(projects => ({
+              projects,
+              mergeRequests: data
+            }))
+          } else {
+            return {
+              projects: savedProjectsParsed,
+              mergeRequests: data
+            }
+          }
+        } else {
+          return fetchProjects(projects, token).then(projects => ({
+            projects,
+            mergeRequests: data
+          }))
+        }
       })
     })

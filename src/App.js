@@ -109,26 +109,29 @@ class App extends Component<{}, AppState> {
   }
 
   _fetch = () => {
-    this.setState({ isLoading: true })
     const { selectedOptions, selectedDate, token } = this.state
 
-    getMergeRequests({
-      state: selectedOptions.value,
-      createdAfter: selectedDate.format('YYYY-MM-DD'),
-      token
-    }).then(({ projects, mergeRequests }) => {
-      this.setState({
-        rows: mergeRequests.map(item =>
-          getRowValue({
-            config: selectedOptions.value,
-            projects,
-            item
-          })
-        ),
-        columns: getColumnsConfig(selectedOptions.value),
-        isLoading: false
+    if (token) {
+      this.setState({ isLoading: true })
+
+      getMergeRequests({
+        state: selectedOptions.value,
+        createdAfter: selectedDate.format('YYYY-MM-DD'),
+        token
+      }).then(({ projects, mergeRequests }) => {
+        this.setState({
+          rows: mergeRequests.map(item =>
+            getRowValue({
+              config: selectedOptions.value,
+              projects,
+              item
+            })
+          ),
+          columns: getColumnsConfig(selectedOptions.value),
+          isLoading: false
+        })
       })
-    })
+    }
   }
 
   _onSelectChange = (option: SelectOption) => {
@@ -155,7 +158,7 @@ class App extends Component<{}, AppState> {
   }
 
   render () {
-    const { isLoading, rows, columns, selectedOptions } = this.state
+    const { isLoading, rows, columns, selectedOptions, token } = this.state
 
     return (
       <div className='app'>
@@ -186,15 +189,15 @@ class App extends Component<{}, AppState> {
             <label className='cw-Filters-itemLabel' htmlFor='token'>
               Access token :
             </label>
-            <input id='token' type='text' value={this.state.token} onChange={this._onInputChange} />
+            <input id='token' type='text' value={token} onChange={this._onInputChange} />
           </div>
         </div>
         {isLoading ? (
           <Loader />
+        ) : token ? (
+          <Chart chartType='Timeline' data={[columns, ...rows]} width='100%' height='100%' legendToggle />
         ) : (
-          <React.Fragment>
-            <Chart chartType='Timeline' data={[columns, ...rows]} width='100%' height='100%' legendToggle />
-          </React.Fragment>
+          'A token is required'
         )}
       </div>
     )
