@@ -203,33 +203,35 @@ class App extends Component<{}, AppState> {
             <input id='token' type='text' value={token} onChange={this._onInputChange} />
           </div>
         </div>
-        {isLoading ? (
-          <Loader />
-        ) : token ? (
-          <React.Fragment>
-            {rows.length ? (
-              <Chart
-                chartType='Timeline'
-                data={[columns, ...rows]}
-                width='100%'
-                height='100%'
-                chartEvents={[
-                  {
-                    eventName: 'select',
-                    callback: ({ chartWrapper }) => {
-                      const [{ row }] = chartWrapper.getChart().getSelection()
-                      const mr = this.state.rawMergeRequests[row]
+        {token ? (
+          isLoading ? (
+            <Loader />
+          ) : (
+            <React.Fragment>
+              {rows.length ? (
+                <Chart
+                  chartType='Timeline'
+                  data={[columns, ...rows]}
+                  width='100%'
+                  height='100%'
+                  chartEvents={[
+                    {
+                      eventName: 'select',
+                      callback: ({ chartWrapper }) => {
+                        const [{ row }] = chartWrapper.getChart().getSelection()
+                        const mr = this.state.rawMergeRequests[row]
 
-                      window.open(mr.web_url, '_blank')
+                        window.open(mr.web_url, '_blank')
+                      }
                     }
-                  }
-                ]}
-                legendToggle
-              />
-            ) : (
-              'No MR found'
-            )}
-          </React.Fragment>
+                  ]}
+                  legendToggle
+                />
+              ) : (
+                'No MR found'
+              )}
+            </React.Fragment>
+          )
         ) : (
           'A token is required'
         )}

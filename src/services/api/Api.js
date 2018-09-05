@@ -56,8 +56,12 @@ export const getMergeRequests = ({
 
         if (savedProjects) {
           const savedProjectsParsed = JSON.parse(savedProjects)
+          const hasNewProjects = difference(
+            Object.keys(savedProjectsParsed).map(t => +t),
+            projects.map(p => p.project_id)
+          ).length
 
-          if (difference(savedProjectsParsed, projects).length) {
+          if (hasNewProjects) {
             return fetchProjects(projects, token).then(projects => ({
               projects,
               mergeRequests: data
