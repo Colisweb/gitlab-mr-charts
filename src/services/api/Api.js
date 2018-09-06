@@ -2,12 +2,7 @@
 
 import axios from 'axios'
 import { uniqBy, difference } from 'lodash'
-import { getProjectDetails } from './Api.bs'
-
-export const getMergeRequestDetails = (projectId: string, mergeRequestId: string, token: string): Promise<{}> =>
-  axios
-    .get(`https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}?private_token=${token}`)
-    .then(res => res.data)
+import { getProjectDetails, getMergeRequestDetails } from './Api.bs'
 
 const fetchProjects = (projects: Array<{}>, token: string): Promise<{}> =>
   Promise.all(projects.map(project => getProjectDetails(project.project_id, token))).then(projects => {
@@ -47,7 +42,7 @@ export const getMergeRequests = ({
     )
     .then(res => res.data)
     .then(data => {
-      return Promise.all(data.map(d => getMergeRequestDetails(d.project_id, d.iid, token))).then(data => {
+      return Promise.all(data.map(d => getMergeRequestDetails(d.project_id, token, d.iid))).then(data => {
         const projects = uniqBy(data, d => d.project_id)
         const savedProjects = window.localStorage.getItem('_cwProjects')
 
