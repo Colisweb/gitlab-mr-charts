@@ -3,6 +3,7 @@
 
 var $$Array = require("bs-platform/lib/js/array.js");
 var Axios = require("axios");
+var Js_dict = require("bs-platform/lib/js/js_dict.js");
 
 var url = "https://gitlab.com/api/v4/projects/";
 
@@ -20,8 +21,15 @@ function getMergeRequestDetails(projectId, token, mergeRequestId) {
 
 function fetchProjects(projectIds, token) {
   return Promise.all($$Array.map((function (projectId) {
-                    return getProjectDetails(projectId, token);
-                  }), projectIds));
+                      return getProjectDetails(projectId, token);
+                    }), projectIds)).then((function (projects) {
+                return Promise.resolve(Js_dict.fromArray($$Array.map((function (project) {
+                                      return /* tuple */[
+                                              project.id,
+                                              project
+                                            ];
+                                    }), projects)));
+              }));
 }
 
 exports.url = url;
