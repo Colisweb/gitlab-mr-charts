@@ -2,10 +2,7 @@
 
 import axios from 'axios'
 import { uniqBy, difference } from 'lodash'
-import { Object } from 'core-js'
-
-export const getProjectDetails = (projectId: string, token: string): Promise<{}> =>
-  axios.get(`https://gitlab.com/api/v4/projects/${projectId}?private_token=${token}`).then(res => res.data)
+import { getProjectDetails } from './Api.bs'
 
 export const getMergeRequestDetails = (projectId: string, mergeRequestId: string, token: string): Promise<{}> =>
   axios
