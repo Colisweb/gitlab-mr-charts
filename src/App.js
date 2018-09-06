@@ -36,7 +36,8 @@ const getColumnsConfig = (config: Config) => {
 }
 
 const getRowValue = ({ config, projects, item }) => {
-  const commonValue = [projects[item.project_id].name, item.title, new Date(item.created_at)]
+  const project = projects.find(_ => _.id === item.project_id)
+  const commonValue = [project.name, item.title, new Date(item.created_at)]
 
   switch (config) {
     case 'all':

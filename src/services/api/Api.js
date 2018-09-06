@@ -2,19 +2,7 @@
 
 import axios from 'axios'
 import { uniqBy, difference } from 'lodash'
-import { getProjectDetails, getMergeRequestDetails } from './Api.bs'
-
-const fetchProjects = (projects: Array<{}>, token: string): Promise<{}> =>
-  Promise.all(projects.map(project => getProjectDetails(project.project_id, token))).then(projects => {
-    const projectsHash = projects.reduce((acc, item) => {
-      acc[item.id] = item
-      return acc
-    }, {})
-
-    window.localStorage.setItem('_cwProjects', JSON.stringify(projectsHash))
-
-    return projectsHash
-  })
+import { getMergeRequestDetails, fetchProjects } from './Api.bs'
 
 type GetMergeRequestsBody = {|
   createdAfter: string,
@@ -54,7 +42,7 @@ export const getMergeRequests = ({
           ).length
 
           if (hasNewProjects) {
-            return fetchProjects(projects, token).then(projects => ({
+            return fetchProjects(projects.map(_ => _.project_id), token).then(projects => ({
               projects,
               mergeRequests: data
             }))
@@ -65,7 +53,7 @@ export const getMergeRequests = ({
             }
           }
         } else {
-          return fetchProjects(projects, token).then(projects => ({
+          return fetchProjects(projects.map(_ => _.project_id), token).then(projects => ({
             projects,
             mergeRequests: data
           }))
