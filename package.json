@@ -5,6 +5,7 @@
   "homepage": "https://colisweb.github.io/gitlab-mr-charts",
   "dependencies": {
     "axios": "0.18.0",
+    "bs-platform": "4.0.5",
     "lodash": "4.17.10",
     "moment": "2.22.2",
     "react": "^16.4.2",
@@ -12,7 +13,8 @@
     "react-dom": "^16.4.2",
     "react-google-charts": "3.0.8",
     "react-scripts": "1.1.5",
-    "react-select": "2.0.0"
+    "react-select": "2.0.0",
+    "reason-react": "0.5.3"
   },
   "scripts": {
     "start": "react-scripts start",
