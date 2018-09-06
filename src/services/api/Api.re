@@ -24,22 +24,13 @@ let getMergeRequestDetails =
     |> then_(response => resolve(response##data))
   );
 
-/* const fetchProjects = (projects: Array<{}>, token: string): Promise<{}> =>
-   Promise.all(projects.map(project => getProjectDetails(project.project_id, token))).then(projects => {
-     const projectsHash = projects.reduce((acc, item) => {
-       acc[item.id] = item
-       return acc
-     }, {})
-
-     window.localStorage.setItem('_cwProjects', JSON.stringify(projectsHash))
-
-     return projectsHash
-   }) */
-
-let fetchProjects = (~projectIds: array(string), ~token: string) =>
-  Js.Promise.all(
-    Array.map(
-      projectId => getProjectDetails(~projectId, ~token),
-      projectIds,
-    ),
-  );
+let fetchProjects:
+  (~projectIds: array(string), ~token: string) =>
+  Js.Promise.t(array(array(projectDetail))) =
+  (~projectIds: array(string), ~token: string) =>
+    Js.Promise.all(
+      Array.map(
+        projectId => getProjectDetails(~projectId, ~token),
+        projectIds,
+      ),
+    );

@@ -33,6 +33,7 @@ export const getMergeRequests = ({
       return Promise.all(data.map(d => getMergeRequestDetails(d.project_id, token, d.iid))).then(data => {
         const projects = uniqBy(data, d => d.project_id)
         const savedProjects = window.localStorage.getItem('_cwProjects')
+        const projectsIds = projects.map(_ => _.project_id)
 
         if (savedProjects) {
           const savedProjectsParsed = JSON.parse(savedProjects)
@@ -42,7 +43,7 @@ export const getMergeRequests = ({
           ).length
 
           if (hasNewProjects) {
-            return fetchProjects(projects.map(_ => _.project_id), token).then(projects => ({
+            return fetchProjects(projectsIds, token).then(projects => ({
               projects,
               mergeRequests: data
             }))
@@ -53,7 +54,7 @@ export const getMergeRequests = ({
             }
           }
         } else {
-          return fetchProjects(projects.map(_ => _.project_id), token).then(projects => ({
+          return fetchProjects(projectsIds, token).then(projects => ({
             projects,
             mergeRequests: data
           }))
