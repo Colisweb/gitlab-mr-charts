@@ -28,11 +28,17 @@ let getMergeRequestDetails:
 
 let fetchProjects:
   (~projectIds: array(string), ~token: string) =>
-  Js.Promise.t(array(projectDetail)) =
+  Js.Promise.t(Js.Dict.t(projectDetail)) =
   (~projectIds, ~token) =>
     Js.Promise.all(
       Array.map(
         projectId => getProjectDetails(~projectId, ~token),
         projectIds,
       ),
-    );
+    )
+    |> Js.Promise.then_(projects =>
+         Js.Dict.fromArray(
+           Array.map(project => (project##id, project), projects),
+         )
+         |> Js.Promise.resolve
+       );
