@@ -40,7 +40,11 @@ const getRowValue = ({ config, projects, item }) => {
 
   switch (config) {
     case 'all':
-      return [...commonValue, item.merged_at ? new Date(item.merged_at) : new Date()]
+      return [...commonValue, item.merged_at
+        ? new Date(item.merged_at)
+        : item.closed_at
+          ? new Date(item.closed_at)
+          : new Date()]
     case 'merged':
       return [...commonValue, new Date(item.merged_at)]
     case 'opened':
