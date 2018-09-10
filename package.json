@@ -24,6 +24,6 @@
   },
   "devDependencies": {
     "eslint-config-dck": "1.0.4",
-    "gh-pages": "1.2.0"
+    "gh-pages": "^1.2.0"
   }
 }
