@@ -46,7 +46,7 @@ export const getMergeRequests = ({
     .get(
       `https://gitlab.com/api/v4/groups/colisweb/merge_requests?${
         state === 'all' ? '' : `state=${state}`
-      }&scope=all&created_after=${createdAfter}&private_token=${token}`
+      }&scope=all&created_after=${createdAfter}&private_token=${token}&per_page=10000`
     )
     .then(res => res.data)
     .then(data => {

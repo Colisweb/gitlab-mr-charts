@@ -40,11 +40,10 @@ const getRowValue = ({ config, projects, item }) => {
 
   switch (config) {
     case 'all':
-      return [...commonValue, item.merged_at
-        ? new Date(item.merged_at)
-        : item.closed_at
-          ? new Date(item.closed_at)
-          : new Date()]
+      return [
+        ...commonValue,
+        item.merged_at ? new Date(item.merged_at) : item.closed_at ? new Date(item.closed_at) : new Date()
+      ]
     case 'merged':
       return [...commonValue, new Date(item.merged_at)]
     case 'opened':
@@ -96,7 +95,8 @@ type AppState = {|
   selectedDate: MomentDate,
   token: string,
   columns: Array<{}>,
-  rawMergeRequests: Array<{}>
+  rawMergeRequests: Array<{}>,
+  error: ?string
 |}
 
 class App extends Component<{}, AppState> {
@@ -107,7 +107,8 @@ class App extends Component<{}, AppState> {
     token: window.localStorage.getItem('_cwAccessToken') || '',
     rows: [],
     columns: getColumnsConfig(selectOptions[0].value),
-    rawMergeRequests: []
+    rawMergeRequests: [],
+    error: null
   }
 
   componentDidMount () {
@@ -132,20 +133,22 @@ class App extends Component<{}, AppState> {
         state: selectedOptions.value,
         createdAfter: selectedDate.format('YYYY-MM-DD'),
         token
-      }).then(({ projects, mergeRequests }) => {
-        this.setState({
-          rows: mergeRequests.map(item =>
-            getRowValue({
-              config: selectedOptions.value,
-              projects,
-              item
-            })
-          ),
-          rawMergeRequests: mergeRequests,
-          columns: getColumnsConfig(selectedOptions.value),
-          isLoading: false
-        })
       })
+        .then(({ projects, mergeRequests }) => {
+          this.setState({
+            rows: mergeRequests.map(item =>
+              getRowValue({
+                config: selectedOptions.value,
+                projects,
+                item
+              })
+            ),
+            rawMergeRequests: mergeRequests,
+            columns: getColumnsConfig(selectedOptions.value),
+            isLoading: false
+          })
+        })
+        .catch(err => {})
     }
   }
 
@@ -173,7 +176,7 @@ class App extends Component<{}, AppState> {
   }
 
   render () {
-    const { isLoading, rows, columns, selectedOptions, token } = this.state
+    const { isLoading, rows, columns, selectedOptions, token, error } = this.state
 
     return (
       <div className='app'>
@@ -210,6 +213,8 @@ class App extends Component<{}, AppState> {
         {token ? (
           isLoading ? (
             <Loader />
+          ) : error ? (
+            <p>{error}</p>
           ) : (
             <React.Fragment>
               {rows.length ? (
@@ -217,7 +222,7 @@ class App extends Component<{}, AppState> {
                   chartType='Timeline'
                   data={[columns, ...rows]}
                   width='100%'
-                  height='100%'
+                  height='90%'
                   chartEvents={[
                     {
                       eventName: 'select',
