@@ -23,7 +23,9 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d build",
+    "reason:clear": "bsb -clean-world",
+    "reason:watch": "bsb -make-world -w"
   },
   "devDependencies": {
     "eslint-config-dck": "1.0.4",
