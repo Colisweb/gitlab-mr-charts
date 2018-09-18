@@ -3,7 +3,9 @@
 
 var $$Array = require("bs-platform/lib/js/array.js");
 var Axios = require("axios");
+var Lodash = require("lodash");
 var Js_dict = require("bs-platform/lib/js/js_dict.js");
+var Helpers$ReactTemplate = require("../../Helpers.bs.js");
 
 var url = "https://gitlab.com/api/v4/projects/";
 
@@ -32,8 +34,52 @@ function fetchProjects(projectIds, token) {
               }));
 }
 
+function getMergeRequestStateQueryParam(state) {
+  var match = Helpers$ReactTemplate.mergeRequestStateFromJs(state);
+  if (match !== undefined) {
+    var s = match;
+    if (s >= 240232876) {
+      if (s >= 563372713) {
+        return "&state=opened";
+      } else {
+        return "&state=closed";
+      }
+    } else if (s >= 134725292) {
+      return "&state=merged";
+    } else {
+      return "&state=locked";
+    }
+  } else {
+    return "";
+  }
+}
+
+function getMergeRequests(state, createdAfter, token) {
+  var url = "https://gitlab.com/api/v4/groups/colisweb/merge_requests?scope=all" + (getMergeRequestStateQueryParam(state) + ("&created_after=" + (createdAfter + ("&private_token=" + token))));
+  return Axios.get(url).then((function (response) {
+                return Promise.all($$Array.map((function (project) {
+                                    return getMergeRequestDetails(project.project_id, token, project.iid);
+                                  }), response.data)).then((function (mergeRequests) {
+                              var projects = Lodash.uniqBy(mergeRequests, (function (mergeRequest) {
+                                      return mergeRequest.project_id;
+                                    }));
+                              var projectIds = $$Array.map((function (project) {
+                                      return project.project_id;
+                                    }), projects);
+                              return fetchProjects(projectIds, token).then((function (projects) {
+                                            return Promise.resolve({
+                                                        projects: projects,
+                                                        mergeRequests: mergeRequests
+                                                      });
+                                          }));
+                            }));
+              }));
+}
+
 exports.url = url;
 exports.getProjectDetails = getProjectDetails;
 exports.getMergeRequestDetails = getMergeRequestDetails;
 exports.fetchProjects = fetchProjects;
+exports.getMergeRequestStateQueryParam = getMergeRequestStateQueryParam;
+exports.getMergeRequests = getMergeRequests;
 /* axios Not a pure module */

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react'
 import { Chart } from 'react-google-charts'
-import { getMergeRequests } from './services/api'
+import { getMergeRequests, getMergeRequests2 } from './services/api'
 import Select from 'react-select'
 import DatePicker from 'react-datepicker'
 import moment from 'moment'
@@ -108,6 +108,7 @@ class App extends Component<{}, AppState> {
   }
 
   componentDidMount () {
+    getMergeRequests2('closed', this.state.selectedDate.format('YYYY-MM-DD'), this.state.token)
     this._fetch()
   }
 
@@ -131,7 +132,7 @@ class App extends Component<{}, AppState> {
         token
       }).then(({ projects, mergeRequests }) => {
         this.setState({
-          rows: mergeRequests.map(item =>
+          rows: mergeRequests.map((item) =>
             getRowValue({
               config: selectedOptions.value,
               projects,
@@ -153,7 +154,7 @@ class App extends Component<{}, AppState> {
   }
 
   _onDatePickerChange = (date: MomentDate) => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       selectedDate: date
     }))
@@ -163,7 +164,7 @@ class App extends Component<{}, AppState> {
     const token = event.target.value
     window.localStorage.setItem('_cwAccessToken', token)
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       ...prevState,
       token
     }))
