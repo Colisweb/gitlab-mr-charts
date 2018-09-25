@@ -1,15 +1,19 @@
 // @flow
 
 import axios from 'axios'
-import { uniqBy, difference } from 'lodash'
-import { Object } from 'core-js'
+import {difference, uniqBy} from 'lodash'
+import {Object} from 'core-js'
+
+const gitlabApi = axios.create({baseURL: 'https://gitlab.com/api/v4/'})
 
 export const getProjectDetails = (projectId: string, token: string): Promise<{}> =>
-  axios.get(`https://gitlab.com/api/v4/projects/${projectId}?private_token=${token}`).then(res => res.data)
+  gitlabApi
+    .get(`projects/${projectId}?private_token=${token}`)
+    .then(res => res.data)
 
 export const getMergeRequestDetails = (projectId: string, mergeRequestId: string, token: string): Promise<{}> =>
-  axios
-    .get(`https://gitlab.com/api/v4/projects/${projectId}/merge_requests/${mergeRequestId}?private_token=${token}`)
+  gitlabApi
+    .get(`projects/${projectId}/merge_requests/${mergeRequestId}?private_token=${token}`)
     .then(res => res.data)
 
 const fetchProjects = (projects: Array<{}>, token: string): Promise<{}> =>
@@ -38,15 +42,15 @@ type GetMergeRequestsPayload = {|
 |}
 
 export const getMergeRequests = ({
-  createdAfter,
-  state,
-  token
-}: GetMergeRequestsBody): Promise<GetMergeRequestsPayload> =>
-  axios
+                                   createdAfter,
+                                   state,
+                                   token
+                                 }: GetMergeRequestsBody): Promise<GetMergeRequestsPayload> =>
+  gitlabApi
     .get(
-      `https://gitlab.com/api/v4/groups/colisweb/merge_requests?${
+      `groups/colisweb/merge_requests?${
         state === 'all' ? '' : `state=${state}`
-      }&scope=all&created_after=${createdAfter}&private_token=${token}&per_page=10000`
+        }&scope=all&created_after=${createdAfter}&private_token=${token}&per_page=10000`
     )
     .then(res => res.data)
     .then(data => {
