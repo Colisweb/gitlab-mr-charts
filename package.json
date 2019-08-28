@@ -23,7 +23,7 @@
     "deploy": "gh-pages -d build"
   },
   "devDependencies": {
-    "eslint-config-dck": "1.0.4",
+    "eslint-config-dck": "1.1.1",
     "gh-pages": "^1.2.0"
   }
 }
