@@ -10,7 +10,7 @@
     "react": "^16.4.2",
     "react-datepicker": "1.6.0",
     "react-dom": "^16.4.2",
-    "react-google-charts": "3.0.8",
+    "react-google-charts": "3.0.15",
     "react-scripts": "1.1.5",
     "react-select": "2.0.0"
   },
